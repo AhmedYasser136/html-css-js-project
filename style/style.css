@@ -48,6 +48,17 @@
             color : black;
             padding: 20px;
             background-color: aqua;
+            width: 125px;
+        }
 
+        #ballspeed{
+            position: absolute;
+            top: 400px;
+            left : 950px;
+            cursor: pointer;
+            font-size: 1.25em;
+            color : black;
+            padding: 20px;
+            background-color: aqua;
         }
 

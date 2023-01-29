@@ -23,53 +23,55 @@ const MAX_LEVEL = 6;
 let GAME_OVER = false;
 let leftArrow = false; // both right and left are false to be stay in there place without moving 
 let rightArrow = false;
+let interval = setTimeout(update, 20);
 //=============================================================================================
 //start paddel
 // CREATE THE PADDLE
 const paddle = {
-    x : cvs.width/2 - PADDLE_WIDTH/2,
-    y : cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT,
-    width : PADDLE_WIDTH,
-    height : PADDLE_HEIGHT,
-    dx :10  //delta x paddel speed
+    x: cvs.width / 2 - PADDLE_WIDTH / 2,
+    y: cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT,
+    width: PADDLE_WIDTH,
+    height: PADDLE_HEIGHT,
+    dx: 6  //delta x paddel speed
 }
 
 // DRAW PADDLE
-function drawPaddle(){
+function drawPaddle() {
     ctx.fillStyle = "red";
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    
+    // ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [40]);
+    // ctx.roundRect(10, 20, 150, 100, [40]);
     // ctx.strokeStyle = "blue";
     // ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
 //عشان نتحكم فى المضرب هنستخدم  الاسكى كود بتاع الحروف للاتجاة شمال ويمين
 // CONTROL THE PADDLE
-document.addEventListener("keydown", function(event){
-   if(event.keyCode == 37){
-       leftArrow = true;
-   }else if(event.keyCode == 39){
-       rightArrow = true;
-   }
+document.addEventListener("keydown", function (event) {
+    if (event.keyCode == 37) {
+        leftArrow = true;
+    } else if (event.keyCode == 39) {
+        rightArrow = true;
+    }
 });
-document.addEventListener("keyup", function(event){
-   if(event.keyCode == 37){
-       leftArrow = false;
-   }else if(event.keyCode == 39){
-       rightArrow = false;
-   }
+document.addEventListener("keyup", function (event) {
+    if (event.keyCode == 37) {
+        leftArrow = false;
+    } else if (event.keyCode == 39) {
+        rightArrow = false;
+    }
 });
 
 //centralized baddel when restart or loose life
-function paddeleReset(){
-    paddle.x=cvs.width/2 - PADDLE_WIDTH/2;
-    paddle.y=cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT;
+function paddeleReset() {
+    paddle.x = cvs.width / 2 - PADDLE_WIDTH / 2;
+    paddle.y = cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT;
 }
 // MOVE PADDLE
-function movePaddle(){
-    if(rightArrow && paddle.x + paddle.width < cvs.width){ //if press right arrow and paddle size was less than canvas width move else donnot move
-        paddle.x += paddle.dx;
-    }else if(leftArrow && paddle.x > 0){
-        paddle.x -= paddle.dx;
+function movePaddle() {
+    if (rightArrow && paddle.x + paddle.width < cvs.width) { //if press right arrow and paddle size was less than canvas width move else donnot move
+        paddle.x += 0.5*paddle.dx;
+    } else if (leftArrow && paddle.x > 0) {
+        paddle.x -= 0.5*paddle.dx;
     }
 }
 //end paddel
@@ -80,47 +82,47 @@ function movePaddle(){
 // circle in canvas is ARC
 // CREATE THE BALL
 const ball = {
-    x : cvs.width/2,
-    y : paddle.y - BALL_RADIUS,
-    radius : BALL_RADIUS,
-    speed : 7,
-    dx : 3 * (Math.random() * 2 - 1),
-    dy : -3
+    x: cvs.width / 2,
+    y: paddle.y - BALL_RADIUS,
+    radius: BALL_RADIUS,
+    speed: 1,
+    dx: 1 * (Math.random() * 2 - 1),
+    dy: -1
 }
 
 // DRAW THE BALL
-function drawBall(){
+function drawBall() {
     ctx.beginPath();
-    
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
     ctx.fillStyle = "#F8F8FF";
     ctx.fill();
-    
+
     // ctx.strokeStyle = "black";
     // ctx.stroke();
-    
+
     ctx.closePath();
 }
 
 // MOVE THE BALL
-function moveBall(){
-    ball.x += ball.dx;
-    ball.y += ball.dy;
+function moveBall() {
+    ball.x += 0.60*ball.dx;
+    ball.y += 0.60*ball.dy;
 }
 
 // BALL AND WALL COLLISION DETECTION
-function ballWallCollision(){
-    if(ball.x + ball.radius > cvs.width || ball.x - ball.radius < 0){
+function ballWallCollision() {
+    if (ball.x + ball.radius > cvs.width || ball.x - ball.radius < 0) {
         ball.dx = - ball.dx;
         WALL_HIT.play();  //audio for collosion left/right sound 
     }
-    
-    if(ball.y - ball.radius < 0){
+
+    if (ball.y - ball.radius < 0) {
         ball.dy = -ball.dy;
         WALL_HIT.play();   //audio for collosion up/down sound
     }
-    
-    if(ball.y + ball.radius > cvs.height){  //if ball collision in down
+
+    if (ball.y + ball.radius > cvs.height) {  //if ball collision in down
         LIFE--; // LOSE LIFE 3-1
         LIFE_LOST.play();
         paddeleReset();
@@ -129,30 +131,30 @@ function ballWallCollision(){
 }
 
 // RESET THE BALL
-function resetBall(){
-    ball.x = cvs.width/2;
+function resetBall() {
+    ball.x = cvs.width / 2;
     ball.y = paddle.y - BALL_RADIUS;
-    ball.dx = 3 * (Math.random() * 2 - 1);
-    ball.dy = -3;
+    ball.dx = 1 * (Math.random() * 2 - 1);
+    ball.dy = -1;
 }
 
 // BALL AND PADDLE COLLISION
-function ballPaddleCollision(){
-    if(ball.x < paddle.x + paddle.width && ball.x > paddle.x && paddle.y < paddle.y + paddle.height && ball.y > paddle.y){
-        
+function ballPaddleCollision() {
+    if (ball.x < paddle.x + paddle.width && ball.x > paddle.x && paddle.y < paddle.y + paddle.height && ball.y > paddle.y) {
+
         // PLAY SOUND
         PADDLE_HIT.play();
-        
+
         // CHECK WHERE THE BALL HIT THE PADDLE
-        let collidePoint = ball.x - (paddle.x + paddle.width/2);
-        
+        let collidePoint = ball.x - (paddle.x + paddle.width / 2);
+
         // NORMALIZE THE VALUES
-        collidePoint = collidePoint / (paddle.width/2);
-        
+        collidePoint = collidePoint / (paddle.width / 2);
+
         // CALCULATE THE ANGLE OF THE BALL
-        let angle = collidePoint * Math.PI/3;
-            
-            
+        let angle = collidePoint * Math.PI / 3;
+
+
         ball.dx = ball.speed * Math.sin(angle);
         ball.dy = - ball.speed * Math.cos(angle);
     }
@@ -167,27 +169,27 @@ function ballPaddleCollision(){
 //-----------------------------------------------------------------
 // CREATE THE BRICKS
 const brick = {
-    row : 5,
-    column : 11,
-    width : 55,
-    height : 20,
-    offSetLeft : 25,
-    offSetTop : 20,
-    marginTop : 40,
-    fillColor : "black",
-    strokeColor : "green"
+    row: 5,
+    column: 11,
+    width: 55,
+    height: 20,
+    offSetLeft: 25,
+    offSetTop: 20,
+    marginTop: 40,
+    fillColor: "black",
+    strokeColor: "green"
 }
 let hits = 0;
 let bricks = [];
 
-function createBricks(){
-    for(let r = 0; r < brick.row; r++){
+function createBricks() {
+    for (let r = 0; r < brick.row; r++) {
         bricks[r] = [];
-        for(let c = 0; c < brick.column; c++){
+        for (let c = 0; c < brick.column; c++) {
             bricks[r][c] = {
-                x : c * ( brick.offSetLeft + brick.width ) + brick.offSetLeft,
-                y : r * ( brick.offSetTop + brick.height ) + brick.offSetTop + brick.marginTop,
-                status : true //show brick status if it false brick is already broken if true brick is not broken
+                x: c * (brick.offSetLeft + brick.width) + brick.offSetLeft,
+                y: r * (brick.offSetTop + brick.height) + brick.offSetTop + brick.marginTop,
+                status: true //show brick status if it false brick is already broken if true brick is not broken
             }
         }
     }
@@ -196,15 +198,14 @@ function createBricks(){
 createBricks();
 
 // draw the bricks
-function drawBricks(){
-    for(let r = 0; r < brick.row; r++){
-        for(let c = 0; c < brick.column; c++){
+function drawBricks() {
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
             let b = bricks[r][c];
             // if the brick isn't broken
-            if(b.status){
+            if (b.status) {
                 ctx.fillStyle = brick.fillColor;
                 ctx.fillRect(b.x, b.y, brick.width, brick.height);
-                
                 // ctx.strokeStyle = brick.strokeColor;
                 // ctx.strokeRect(b.x, b.y, brick.width, brick.height);
             }
@@ -213,13 +214,13 @@ function drawBricks(){
 }
 
 // ball brick collision
-function ballBrickCollision(){
-    for(let r = 0; r < brick.row; r++){
-        for(let c = 0; c < brick.column; c++){
+function ballBrickCollision() {
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
             let b = bricks[r][c];
             // if the brick isn't broken
-            if(b.status){  
-                if(ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + brick.width && ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + brick.height){
+            if (b.status) {
+                if (ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + brick.width && ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + brick.height) {
                     BRICK_HIT.play();
                     //we need to add here ball bricks from two hits not one hits
                     ball.dy = - ball.dy;
@@ -232,62 +233,62 @@ function ballBrickCollision(){
 }
 
 // show game stats
-function showGameStats(text, textX, textY, img, imgX, imgY){
+function showGameStats(text, textX, textY, img, imgX, imgY) {
     // draw text
     ctx.fillStyle = "#FFF";
     ctx.font = "25px One";
     ctx.fillText(text, textX, textY);
-    
+
     // draw image
     ctx.drawImage(img, imgX, imgY, width = 25, height = 25); //every image icon have same size 25*25
 }
 
 // DRAW FUNCTION
-function draw(){
+function draw() {
     drawPaddle();
-    
+
     drawBall();
-    
+
     drawBricks();
-    
+
     // SHOW SCORE
     showGameStats(SCORE, 35, 25, SCORE_IMG, 5, 5);  //(score , x , y , score img icon ,x ,y)
     // SHOW LIVES
-    showGameStats(LIFE, cvs.width - 25, 25, LIFE_IMG, cvs.width-55, 5); 
+    showGameStats(LIFE, cvs.width - 25, 25, LIFE_IMG, cvs.width - 55, 5);
     // SHOW LEVEL
-    showGameStats(LEVEL, cvs.width/2, 25, LEVEL_IMG, cvs.width/2 - 30, 5);
+    showGameStats(LEVEL, cvs.width / 2, 25, LEVEL_IMG, cvs.width / 2 - 30, 5);
 }
 
 // game over
-function gameOver(){
-    if(LIFE <= 0){
+function gameOver() {
+    if (LIFE <= 0) {
         showYouLose();
         GAME_OVER = true;
     }
 }
 
 // level up
-function levelUp(){
+function levelUp() {
     let isLevelDone = true;
-    
+
     // check if all the bricks are broken
-    for(let r = 0; r < brick.row; r++){
-        for(let c = 0; c < brick.column; c++){
-            isLevelDone = isLevelDone && ! bricks[r][c].status;
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
+            isLevelDone = isLevelDone && !bricks[r][c].status;
         }
     }
-    
-    if(isLevelDone){
+
+    if (isLevelDone) {
         WIN.play();
-        
-        if(LEVEL >= MAX_LEVEL){
+
+        if (LEVEL >= MAX_LEVEL) {
             showYouWin();
             GAME_OVER = true;
             return;
         }
         brick.row++;
         createBricks();
-        ball.speed += 0.5;
+        ball.speed += 0.3;
         paddeleReset();
         resetBall();
         LEVEL++;
@@ -295,62 +296,66 @@ function levelUp(){
 }
 
 // UPDATE GAME FUNCTION
-function update(){
+function update() {
+    if(isPaused==false){
     movePaddle();
-    
+
     moveBall();
-    
+
     ballWallCollision();
-    
+
     ballPaddleCollision();
-    
+
     ballBrickCollision();
-    
+
     gameOver();
-    
+
     levelUp();
 }
+
+}
+
 class Brick {
-    constructor(){
+    constructor() {
         this.hitCount = 0;
     }
 }
 //احنا هنعمل الكورة زى المضرب فهنخلى المضرب يتكرر بس فى صورة كورة 
 // GAME LOOP
-function loop(){
+function loop() {
     // CLEAR THE CANVAS
-    ctx.drawImage(BG_IMG, 0, 0 , 900, 700);
-    
+    ctx.drawImage(BG_IMG, 0, 0, 900, 700);
+
     draw();
-    
+
     update();
-    
-    if(! GAME_OVER){
+
+    if (!GAME_OVER) {
         requestAnimationFrame(loop);
     }
     // In your game loop:
-if (ballBrickCollision) {
-    brick.hitCount++;
-    if (brick.hits  === 2) {
-        brick.break();
-        brick.hits  = 0;
+    if (ballBrickCollision) {
+        brick.hitCount++;
+        if (brick.hits === 2) {
+            brick.break();
+            brick.hits = 0;
+        }
     }
-}
 }
 
 
 // SELECT SOUND ELEMENT
-const soundElement  = document.getElementById("sound");
+const soundElement = document.getElementById("sound");
 
 soundElement.addEventListener("click", audioManager);
 
-function audioManager(){
+function audioManager() {
     // CHANGE IMAGE SOUND_ON/OFF
     let imgSrc = soundElement.getAttribute("src");
     let SOUND_IMG = imgSrc == "img/SOUND_ON.png" ? "img/SOUND_OFF.png" : "img/SOUND_ON.png";
-    
+
     soundElement.setAttribute("src", SOUND_IMG);
-    
+
     // MUTE AND UNMUTE SOUNDS
     WALL_HIT.muted = WALL_HIT.muted ? false : true;
     PADDLE_HIT.muted = PADDLE_HIT.muted ? false : true;
@@ -365,52 +370,86 @@ const gameover = document.getElementById("gameover");
 const youwin = document.getElementById("youwin");
 const youlose = document.getElementById("youlose");
 const restart = document.getElementById("restart");
+const puasee = document.getElementById("pauseBtn");
 
+
+// CLICK pause BUTTON to stop game
+// restart.addEventListener("click", function(){
+//     location.(); // pause the page
+// })
 // CLICK ON PLAY AGAIN BUTTON
-restart.addEventListener("click", function(){
+restart.addEventListener("click", function () {
     location.reload(); // reload the page
 })
 
 // SHOW YOU WIN
-function showYouWin(){
+function showYouWin() {
     gameover.style.display = "block";
     youwon.style.display = "block";
 }
 
 // SHOW YOU LOSE
-function showYouLose(){
+function showYouLose() {
     gameover.style.display = "block";
     youlose.style.display = "block";
 }
 
 
 // Initialize the button and a variable to keep track of the game state
-let pauseBtn = document.getElementById("start");
-let gamePaused = false;
+let playing = document.getElementById("start");
+let gamePlay = false;
 
 // Add an event listener to the button to toggle the game state
-pauseBtn.addEventListener("click", function() {
-  
-    gamePaused = true;
-    pauseBtn.innerHTML = "Play";
+playing.addEventListener("click", function () {
+
+    gamePlay = true;
+    playing.innerHTML = "increase ball speed";
     start();
-  });
+});
 
 
-// Example function to stop the game
+// Example function to start the game
 function start() {
     loop();
 }
 
 
+let isPaused = false;
 
+function pauseGame() {
+    clearInterval(interval);
+    // isPaused = true;
+    // cvs.style.opacity = 0.5;
+    // ctx.font = "90px tahoma";
+    // ctx.fillStyle = "white";
+    // ctx.textAlign = "center";
+    // ctx.textBaseAlign = "middle";
+    // ctx.fillText("game paused", 400, 250);
+}
 
+function resumegame() {
+    isPaused = false;
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    cvs.style.opacity = 1
+    interval = setInterval(loop, 20)
+}
 
-
-
-
-
-
+document.addEventListener('keyup', function (e) {
+    if (e.which === 32) {
+    switch (isPaused) {
+        case false:
+                loop()
+                isPaused=true;
+            break;
+            case true:
+                pauseGame();
+                isPaused=false;
+            break;
+        default:
+            break;
+    }
+}
+});
 
 
 
