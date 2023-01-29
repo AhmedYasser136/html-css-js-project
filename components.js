@@ -2,8 +2,6 @@
 
 /////// LOAD IMAGES ////////
 
-// LOAD BG IMAGE
-// let bobo = Document.getElementById("dd")
 const BG_IMG = new Image();
 BG_IMG.src = "img/light.png";
 
@@ -39,34 +37,4 @@ WIN.src = "sounds/win.mp3";
 const BRICK_HIT = new Audio();
 BRICK_HIT.src = "sounds/brick_hit.mp3";
 
-
 /////// END LOAD SOUNDS ////////
-
-// function myFunction() {
-//     var element = document.body;
-//     element.classList.toggle("dark-mode");
-// }
-
-
-
-// let colorImage = document.getElementById("colorImage");
-// let button2 = document.getElementById("button2");
-
-// function changeToBW() {
-//   var images = [
-//     "https://opengameart.org/sites/default/files/background_0.png"
-// ,
-//     "https://abstracthdwallpapers.files.wordpress.com/2012/09/black-background-metal-texture-wallpaper-1400x1050.jpg"
-//   ];
-//   var imageNum = parseInt(colorImage.dataset.color);
-//   var nextImg = imageNum === 0 ? 1 : 0;
-//   colorImage.src = images[nextImg];
-//   colorImage.dataset.color = nextImg;
-  
-//   var element = document.body;
-//   element.classList.toggle("dark-mode");
-// }
-// button2.addEventListener("click", changeToBW);
-
-// BG_IMG.src = 
-
