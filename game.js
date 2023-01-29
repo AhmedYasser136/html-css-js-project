@@ -23,7 +23,6 @@ const MAX_LEVEL = 6;
 let GAME_OVER = false;
 let leftArrow = false; // both right and left are false to be stay in there place without moving 
 let rightArrow = false;
-let interval = setTimeout(update, 20);
 //=============================================================================================
 //start paddel
 // CREATE THE PADDLE
@@ -32,15 +31,14 @@ const paddle = {
     y: cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT,
     width: PADDLE_WIDTH,
     height: PADDLE_HEIGHT,
-    dx: 6  //delta x paddel speed
+    dx: 10  //delta x paddel speed
 }
 
 // DRAW PADDLE
 function drawPaddle() {
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "white";
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    // ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [40]);
-    // ctx.roundRect(10, 20, 150, 100, [40]);
+
     // ctx.strokeStyle = "blue";
     // ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
@@ -69,9 +67,9 @@ function paddeleReset() {
 // MOVE PADDLE
 function movePaddle() {
     if (rightArrow && paddle.x + paddle.width < cvs.width) { //if press right arrow and paddle size was less than canvas width move else donnot move
-        paddle.x += 0.5*paddle.dx;
+        paddle.x += paddle.dx;
     } else if (leftArrow && paddle.x > 0) {
-        paddle.x -= 0.5*paddle.dx;
+        paddle.x -= paddle.dx;
     }
 }
 //end paddel
@@ -85,9 +83,9 @@ const ball = {
     x: cvs.width / 2,
     y: paddle.y - BALL_RADIUS,
     radius: BALL_RADIUS,
-    speed: 1,
-    dx: 1 * (Math.random() * 2 - 1),
-    dy: -1
+    speed: 7,
+    dx: 3 * (Math.random() * 2 - 1),
+    dy: -3
 }
 
 // DRAW THE BALL
@@ -106,8 +104,8 @@ function drawBall() {
 
 // MOVE THE BALL
 function moveBall() {
-    ball.x += 0.60*ball.dx;
-    ball.y += 0.60*ball.dy;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
 }
 
 // BALL AND WALL COLLISION DETECTION
@@ -134,8 +132,8 @@ function ballWallCollision() {
 function resetBall() {
     ball.x = cvs.width / 2;
     ball.y = paddle.y - BALL_RADIUS;
-    ball.dx = 1 * (Math.random() * 2 - 1);
-    ball.dy = -1;
+    ball.dx = 3 * (Math.random() * 2 - 1);
+    ball.dy = -3;
 }
 
 // BALL AND PADDLE COLLISION
@@ -179,17 +177,18 @@ const brick = {
     fillColor: "black",
     strokeColor: "green"
 }
-let hits = 0;
-let bricks = [];
+let bricks = new Array(brick.row);
 
 function createBricks() {
     for (let r = 0; r < brick.row; r++) {
-        bricks[r] = [];
+        bricks[r] = new Array(brick.column);
         for (let c = 0; c < brick.column; c++) {
             bricks[r][c] = {
                 x: c * (brick.offSetLeft + brick.width) + brick.offSetLeft,
                 y: r * (brick.offSetTop + brick.height) + brick.offSetTop + brick.marginTop,
-                status: true //show brick status if it false brick is already broken if true brick is not broken
+                status: true, //show brick status if it false brick is already broken if true brick is not broken
+                hits: 2,
+                fillColor: "black"
             }
         }
     }
@@ -197,18 +196,20 @@ function createBricks() {
 
 createBricks();
 
-// draw the bricks
 function drawBricks() {
     for (let r = 0; r < brick.row; r++) {
         for (let c = 0; c < brick.column; c++) {
-            let b = bricks[r][c];
-            // if the brick isn't broken
-            if (b.status) {
+            if (bricks[r][c].status && bricks[r][c].hits === 2) {
+                brick.fillColor = "black";
                 ctx.fillStyle = brick.fillColor;
-                ctx.fillRect(b.x, b.y, brick.width, brick.height);
-                // ctx.strokeStyle = brick.strokeColor;
-                // ctx.strokeRect(b.x, b.y, brick.width, brick.height);
+                ctx.fillRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height);
             }
+            else if (bricks[r][c].status && bricks[r][c].hits === 1) {
+                brick.fillColor = "gray";
+                ctx.fillStyle = brick.fillColor;
+                ctx.fillRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height);
+            }
+
         }
     }
 }
@@ -219,19 +220,37 @@ function ballBrickCollision() {
         for (let c = 0; c < brick.column; c++) {
             let b = bricks[r][c];
             // if the brick isn't broken
-            if (b.status) {
+            if (b.status && b.hits > 0) {
                 if (ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + brick.width && ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + brick.height) {
                     BRICK_HIT.play();
                     //we need to add here ball bricks from two hits not one hits
+                    bricks[r][c].hits--;
+
+                    if (bricks[r][c].hits == 1) {
+                        console.log('tamam');
+                        b.fillColor = "gray";
+                        ctx.fillStyle = b.fillColor;
+                        ctx.fillRect(b.x, b.y, brick.width, brick.height);
+                        // newrow = r;
+                        // col = c;
+                        // console.log(newrow);
+                        // console.log(col);
+                    }
+                    // bricks[r][c].fillColor = "#0000ff";
+                    // ctx.fillStyle = bricks[r][c].fillColor;
+                    // ctx.fillRect(b.x, b.y, brick.width, brick.height);
                     ball.dy = - ball.dy;
-                    b.status = false; // the brick is broken
+                    // b.status = true; // the brick is broken
                     SCORE += SCORE_UNIT;
                 }
+            }
+            else if (b.hits === 0) {
+                b.status = false;
+                // SCORE += SCORE_UNIT;
             }
         }
     }
 }
-
 // show game stats
 function showGameStats(text, textX, textY, img, imgX, imgY) {
     // draw text
@@ -288,7 +307,7 @@ function levelUp() {
         }
         brick.row++;
         createBricks();
-        ball.speed += 0.3;
+        ball.speed += 0.5;
         paddeleReset();
         resetBall();
         LEVEL++;
@@ -297,7 +316,6 @@ function levelUp() {
 
 // UPDATE GAME FUNCTION
 function update() {
-    if(isPaused==false){
     movePaddle();
 
     moveBall();
@@ -312,14 +330,6 @@ function update() {
 
     levelUp();
 }
-
-}
-
-class Brick {
-    constructor() {
-        this.hitCount = 0;
-    }
-}
 //احنا هنعمل الكورة زى المضرب فهنخلى المضرب يتكرر بس فى صورة كورة 
 // GAME LOOP
 function loop() {
@@ -333,15 +343,8 @@ function loop() {
     if (!GAME_OVER) {
         requestAnimationFrame(loop);
     }
-    // In your game loop:
-    if (ballBrickCollision) {
-        brick.hitCount++;
-        if (brick.hits === 2) {
-            brick.break();
-            brick.hits = 0;
-        }
-    }
 }
+loop();
 
 
 // SELECT SOUND ELEMENT
@@ -370,13 +373,7 @@ const gameover = document.getElementById("gameover");
 const youwin = document.getElementById("youwin");
 const youlose = document.getElementById("youlose");
 const restart = document.getElementById("restart");
-const puasee = document.getElementById("pauseBtn");
 
-
-// CLICK pause BUTTON to stop game
-// restart.addEventListener("click", function(){
-//     location.(); // pause the page
-// })
 // CLICK ON PLAY AGAIN BUTTON
 restart.addEventListener("click", function () {
     location.reload(); // reload the page
@@ -395,64 +392,44 @@ function showYouLose() {
 }
 
 
-// Initialize the button and a variable to keep track of the game state
-let playing = document.getElementById("start");
-let gamePlay = false;
-
-// Add an event listener to the button to toggle the game state
-playing.addEventListener("click", function () {
-
-    gamePlay = true;
-    playing.innerHTML = "increase ball speed";
-    start();
-});
 
 
-// Example function to start the game
-function start() {
-    loop();
-}
+var button2 = document.getElementById("button2");
+let isdarkmode = false;
+
+//function change background
+button2.addEventListener("click", function () {
+    BG_IMG.src = "img/dark.jpg";
+    // document.getElementById('dd').style.backgroundColor = 'black';
 
 
-let isPaused = false;
-
-function pauseGame() {
-    clearInterval(interval);
-    // isPaused = true;
-    // cvs.style.opacity = 0.5;
-    // ctx.font = "90px tahoma";
-    // ctx.fillStyle = "white";
-    // ctx.textAlign = "center";
-    // ctx.textBaseAlign = "middle";
-    // ctx.fillText("game paused", 400, 250);
-}
-
-function resumegame() {
-    isPaused = false;
-    ctx.clearRect(0, 0, cvs.width, cvs.height);
-    cvs.style.opacity = 1
-    interval = setInterval(loop, 20)
-}
-
-document.addEventListener('keyup', function (e) {
-    if (e.which === 32) {
-    switch (isPaused) {
+    switch (isdarkmode) {
         case false:
-                loop()
-                isPaused=true;
+            document.getElementById('dd').style.backgroundColor = 'black';
+            isdarkmode = true;
+            BG_IMG.src = "img/dark.jpg";
+            
+            ctx.fillStyle = "black";
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        
             break;
-            case true:
-                pauseGame();
-                isPaused=false;
+
+        case true:
+            document.getElementById('dd').style.backgroundColor = 'white';
+            isdarkmode = false;
+            BG_IMG.src = "img/light.png";
+            
+            ctx.fillStyle = "white";
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        
             break;
+
         default:
             break;
     }
-}
-});
 
 
 
-
+})
 
 

@@ -2,10 +2,10 @@
 
 /////// LOAD IMAGES ////////
 
-// LOAD BG IMAGE
 const BG_IMG = new Image();
-BG_IMG.src = "./img/smashbg.avif";
-// BG_IMG.style.height="500px"; //there is big proplem image not fit in canvas back ground
+BG_IMG.src = "img/light.png";
+
+BG_IMG.style.height = "500px"; //there is big proplem image not fit in canvas back ground
 const LEVEL_IMG = new Image();
 LEVEL_IMG.src = "img/4676101-200.png";
 

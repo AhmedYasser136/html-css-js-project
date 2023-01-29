@@ -1,64 +1,85 @@
-        *{
-            font-family: "Germania One";
-        }
-        
-        #sound{
-            width: 30px;
-            height : 30px;
-            cursor: pointer;
-            position: absolute;
-            top : 680px;
-            left : 15px;
-        }
-        #gameover{
-            position: absolute;
-            width : 900px;
-            height: 700px;
-            background: rgba(0,0,0,0.5);
-            display: none;
-        }
-        #youwon{
-            width: 100px;
-            position: absolute;
-            top : 200px;
-            left : 150px;
-            display: none;
-        }
-        #youlose{
-            width:400px;
-            position: absolute;
-            top: 100px;
-            left : 0px;
-            display: none;
-        }
-        #restart{
-            position: absolute;
-            top: 310px;
-            left : 155px;
-            cursor: pointer;
-            font-size: 1.25em;
-            color : #FFF;
-        }
-        #start{
-            position: absolute;
-            top: 330px;
-            left : 950px;
-            cursor: pointer;
-            font-size: 1.25em;
-            color : black;
-            padding: 20px;
-            background-color: aqua;
-            width: 125px;
-        }
+* {
+    font-family: "Germania One";
+    padding: 0;
+    margin: 0;
+}
 
-        #ballspeed{
-            position: absolute;
-            top: 400px;
-            left : 950px;
-            cursor: pointer;
-            font-size: 1.25em;
-            color : black;
-            padding: 20px;
-            background-color: aqua;
-        }
+#sound {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    position: absolute;
+    top: 530px;
+    left: 290px;
+    z-index: 2;
+
+}
+
+#gameover {
+    position: absolute;
+    width: 900px;
+    /* height: 700px; */
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 2;
+
+}
+
+#youwon {
+    width: 100px;
+    position: absolute;
+    top: 200px;
+    left: 150px;
+    display: none;
+}
+
+#youlose {
+    width: 400px;
+    position: absolute;
+    top: 250px;
+    left: 480px;
+    display: none;
+}
+
+#restart {
+    position: absolute;
+    top: 430px;
+    left: 600px;
+    cursor: pointer;
+    font-size: 1.25em;
+    color: white;
+}
+
+body {
+    padding: 25px;
+    background-color: white;
+    color: black;
+    font-size: 25px;
+}
+
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+#button2 {
+    position: absolute;
+    top: 530px;
+    right: 240px;
+    height: 30px;
+    width: 30px;
+    border-radius: 10px;
+    background-color: black;
+
+}
+
+
+canvas {
+    position: absolute;
+    left: 250px;
+    top: 80px;
+    border-radius: 10px;
+}
+
+
 
