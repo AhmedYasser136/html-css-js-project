@@ -521,14 +521,14 @@ dark_mode.addEventListener("click",function(){
         case false:
             BG_IMG.src = "img/DarkMode.jpg";
             // document.getElementsByTagName('body').style.backgroundcolor="#01435B";
-            document.body.style.backgroundColor = "#424043";
+            document.body.style.backgroundColor = "black";
             isDarkClicked=true;
             break;
             case true:
                 // cvs.style.backgroundColor = "#F2DEBA";
                 BG_IMG.src='img/lightMode.jpg';
                 // document.getElementsByTagName('body').style.backgroundcolor="#FFFBF5";
-                document.body.style.backgroundColor = "#F2DEBA";
+                document.body.style.backgroundColor = "white";
                 // brick.fillColor = "black";
                 isDarkClicked=false;
             break;
