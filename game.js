@@ -12,9 +12,9 @@ ctx.lineWidth = 5;
 
 // GAME VARIABLES AND CONSTANTS
 const add_play = false;
-const PADDLE_WIDTH = 135;
+const PADDLE_WIDTH = 150;
 const PADDLE_MARGIN_BOTTOM = 50;
-const PADDLE_HEIGHT = 20;
+const PADDLE_HEIGHT = 15;
 const BALL_RADIUS = 10;
 const gift_RADIUS = 10;
 let LIFE = 3; // PLAYER HAS 3 LIVES
@@ -27,6 +27,8 @@ let leftArrow = false; // both right and left are false to be stay in there plac
 let rightArrow = false;
 let isDarkClicked = false;
 let interval = setTimeout(update, 20);
+let isMovingLeft = false;
+let isMovingRight = false;
 //=============================================================================================
 //start paddel
 // CREATE THE PADDLE
@@ -40,8 +42,10 @@ const paddle = {
 
 // DRAW PADDLE
 function drawPaddle() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    ctx.fillStyle = "white";
+    // ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [10]);
+    ctx.fill();
     // ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [40]);
     // ctx.roundRect(10, 20, 150, 100, [40]);
     // ctx.strokeStyle = "blue";
@@ -49,34 +53,81 @@ function drawPaddle() {
 }
 //عشان نتحكم فى المضرب هنستخدم  الاسكى كود بتاع الحروف للاتجاة شمال ويمين
 // CONTROL THE PADDLE
+// document.addEventListener("keydown", function (event) {
+//     if (event.keyCode == 37) {
+//         leftArrow = true;
+//     } else if (event.keyCode == 39) {
+//         rightArrow = true;
+//     }
+// });
+// document.addEventListener("keyup", function (event) {
+//     if (event.keyCode == 37) {
+//         leftArrow = false;
+//     } else if (event.keyCode == 39) {
+//         rightArrow = false;
+//     }
+// });
+
 document.addEventListener("keydown", function (event) {
     if (event.keyCode == 37) {
-        leftArrow = true;
+        isMovingLeft = true;
     } else if (event.keyCode == 39) {
-        rightArrow = true;
+        isMovingRight = true;
     }
 });
 document.addEventListener("keyup", function (event) {
     if (event.keyCode == 37) {
-        leftArrow = false;
+        isMovingLeft = false;
     } else if (event.keyCode == 39) {
-        rightArrow = false;
+        isMovingRight = false;
     }
 });
+
+document.addEventListener("mousemove", mouseMoveHandler, false);
+function mouseMoveHandler(e) {
+    let relativeX = e.clientX - cvs.offsetLeft;
+    if (relativeX > 0 && relativeX < cvs.width) {
+        paddle.x = relativeX - PADDLE_WIDTH / 2;
+    }
+}
+
+//control paddel using mouse
+// document.addEventListener("mousemove", event => {
+//     paddle.style.left = event.clientX - paddle.offsetWidth / 2 + "px";
+//   });
+//   setInterval(() => {
+//     if (isMovingLeft) {
+//       paddle.x.style.left = paddle.dx.offsetLeft - 10 + "px";
+//     } else if (isMovingRight) {
+//       paddle.style.left = paddle.offsetLeft + 10 + "px";
+//     }
+//   }, 16);
 
 //centralized baddel when restart or loose life
 function paddeleReset() {
     paddle.x = cvs.width / 2 - PADDLE_WIDTH / 2;
     paddle.y = cvs.height - PADDLE_MARGIN_BOTTOM - PADDLE_HEIGHT;
 }
-// MOVE PADDLE
+
+// MOVE PADDLE by keyboard
 function movePaddle() {
-    if (rightArrow && paddle.x + paddle.width < cvs.width) { //if press right arrow and paddle size was less than canvas width move else donnot move
-        paddle.x += 0.5 * paddle.dx;
-    } else if (leftArrow && paddle.x > 0) {
-        paddle.x -= 0.5 * paddle.dx;
+    if (isMovingRight && paddle.x + paddle.width < cvs.width) { //if press right arrow and paddle size was less than canvas width move else donnot move
+        paddle.x += paddle.dx;
+        // paddle.x.style.left = paddle.dx.offsetLeft - 10 + "px";
+    } else if (isMovingLeft && paddle.x > 0) {
+        paddle.x -= paddle.dx;
+        // paddle.x.style.left = paddle.dx.offsetLeft + 10 + "px";
     }
 }
+
+// MOVE PADDLE
+// function movePaddle() {
+//     if (rightArrow && paddle.x + paddle.width < cvs.width) { //if press right arrow and paddle size was less than canvas width move else donnot move
+//         paddle.x += 0.5 * paddle.dx;
+//     } else if (leftArrow && paddle.x > 0) {
+//         paddle.x -= 0.5 * paddle.dx;
+//     }
+// }
 //end paddel
 //=======================================================================================
 //start ball
@@ -109,8 +160,8 @@ function drawBall() {
 
 // MOVE THE BALL
 function moveBall() {
-    ball.x += 0.60 * ball.dx;
-    ball.y += 0.60 * ball.dy;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
 }
 
 // BALL AND WALL COLLISION DETECTION
@@ -122,7 +173,7 @@ function ballWallCollision() {
 
     if (ball.y - ball.radius < 0) {
         ball.dy = -ball.dy;
-        WALL_HIT.play();   //audio for collosion up/down sound
+        WALL_HIT.play();   //audio for collosion up sound
     }
 
     if (ball.y + ball.radius > cvs.height) {  //if ball collision in down
@@ -176,9 +227,9 @@ const brick = {
     column: 7,
     width: 75,
     height: 20,
-    offSetLeft: 40,
-    offSetTop: 40,
-    marginTop: 40,
+    offSetLeft: 50,
+    offSetTop: 20,
+    marginTop: 20,
     fillColor: "#BB480D",
     // strokeColor: "green"
 }
@@ -205,14 +256,17 @@ function drawBricks() {
     for (let r = 0; r < brick.row; r++) {
         for (let c = 0; c < brick.column; c++) {
             if (bricks[r][c].status && bricks[r][c].hits === 2) {
-                brick.fillColor = "#471212";
+                brick.fillColor = "#5adeff";
                 ctx.fillStyle = brick.fillColor;
                 ctx.fillRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height);
+                // ctx.roundRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height, [10]);
             }
             else if (bricks[r][c].status && bricks[r][c].hits === 1) {
-                brick.fillColor = "#A13434";
+                brick.fillColor = "#d8f2ff";
                 ctx.fillStyle = brick.fillColor;
                 ctx.fillRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height);
+                // ctx.roundRect(bricks[r][c].x, bricks[r][c].y, brick.width, brick.height, [10]);
+                
             }
             // let b = bricks[r][c];
             // // if the brick isn't broken
@@ -230,42 +284,100 @@ function drawBricks() {
 }
 
 // ball brick collision
-function ballBrickCollision() {
-    for (let r = 0; r < brick.row; r++) {
-        for (let c = 0; c < brick.column; c++) {
+
+// function ballBrickCollision()
+// {
+//     for(let r = 0; r < brick.row; r++)
+//     {
+//         for(let c = 0; c < brick.column; c++)
+//         {
+//             let b = bricks[r][c];
+//             // if the brick isn't broken
+//             if(b.status == true && b.hits > 0)
+//             {
+//                 // if(    (ball.x > b.x) 
+//                 //     && (ball.x < b.x + brick.width + 5) 
+//                 //     && (ball.y > b.y) 
+//                 //     && (ball.y < b.y + brick.height) )
+//                 if(    ball.x +  ball.radius > b.x
+//                     && ball.x < b.x + brick.width 
+//                     && ball.y +  ball.radius > b.y
+//                     && ball.y < b.y + brick.height + 10)
+//                 {
+//                     // console.log("tamam");
+//                     BRICK_HIT.play();
+//                     //we need to add here ball bricks from two hits not one hits
+//                     b.hits--;
+//                     b.fillColor = "gray";
+//                     ctx.fillStyle = b.fillColor;
+//                     ctx.fillRect(b.x, b.y, brick.width, brick.height);
+
+//                     if(ball.x + 2 * ball.radius - ball.dx <= bricks[r][c].x || ball.x - ball.dx >= bricks[r][c].x + brick.width)
+//                     {
+//                         ball.dx = -ball.dx;
+//                     }
+//                     else
+//                     {
+//                         ball.dy = - ball.dy;
+//                     }
+//                     SCORE += SCORE_UNIT;
+//                 }
+//             }
+//             else if(b.hits === 0)
+//             {
+//                 b.status = false;
+//             }
+//         }
+//     }
+// }
+
+
+function ballBrickCollision()
+{
+    for(let r = 0; r < brick.row; r++)
+    {
+        for(let c = 0; c < brick.column; c++)
+        {
             let b = bricks[r][c];
             // if the brick isn't broken
-            if (b.status && b.hits > 0) {
-                if (ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + (brick.width+10) && ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + (brick.height+6)) {
+            if(b.status == true && b.hits > 0)
+            {
+                // if(    (ball.x > b.x) 
+                //     && (ball.x < b.x + brick.width + 5) 
+                //     && (ball.y > b.y) 
+                //     && (ball.y < b.y + brick.height) )
+                if(    ball.x + 2 * ball.radius > b.x
+                    && ball.x < b.x + brick.width +10
+                    && ball.y + 2 * ball.radius > b.y
+                    && ball.y < b.y + brick.height)
+                {
+                    // console.log("tamam");
                     BRICK_HIT.play();
                     //we need to add here ball bricks from two hits not one hits
-                    bricks[r][c].hits--;
+                    b.hits--;
+                    b.fillColor = "gray";
+                    ctx.fillStyle = b.fillColor;
+                    ctx.fillRect(b.x, b.y, brick.width, brick.height);
 
-                    if (bricks[r][c].hits == 1) {
-                        console.log('tamam');
-                        b.fillColor = "gray";
-                        ctx.fillStyle = b.fillColor;
-                        ctx.fillRect(b.x, b.y, brick.width, brick.height);
-                        // newrow = r;
-                        // col = c;
-                        // console.log(newrow);
-                        // console.log(col);
+                    if(ball.x + 2 * ball.radius - ball.dx <= bricks[r][c].x || ball.x - ball.dx >= bricks[r][c].x + brick.width)
+                    {
+                        ball.dx = -ball.dx;
                     }
-                    // bricks[r][c].fillColor = "#0000ff";
-                    // ctx.fillStyle = bricks[r][c].fillColor;
-                    // ctx.fillRect(b.x, b.y, brick.width, brick.height);
-                    ball.dy = - ball.dy;
-                    // b.status = true; // the brick is broken
+                    else
+                    {
+                        ball.dy = - ball.dy;
+                    }
                     SCORE += SCORE_UNIT;
                 }
             }
-            else if (b.hits === 0) {
+            else if(b.hits === 0)
+            {
                 b.status = false;
-                // SCORE += SCORE_UNIT;
             }
         }
     }
 }
+
 // //GIFT INSIDE BRICKS
 // let gift = {
 //     x: cvs.width / 2,
@@ -516,21 +628,21 @@ function showYouLose() {
     youlose.style.display = "block";
 }
 //Dark Mode Display
-dark_mode.addEventListener("click",function(){
+dark_mode.addEventListener("click", function () {
     switch (isDarkClicked) {
         case false:
             BG_IMG.src = "img/DarkMode.jpg";
             // document.getElementsByTagName('body').style.backgroundcolor="#01435B";
             document.body.style.backgroundColor = "black";
-            isDarkClicked=true;
+            isDarkClicked = true;
             break;
-            case true:
-                // cvs.style.backgroundColor = "#F2DEBA";
-                BG_IMG.src='img/lightMode.jpg';
-                // document.getElementsByTagName('body').style.backgroundcolor="#FFFBF5";
-                document.body.style.backgroundColor = "white";
-                // brick.fillColor = "black";
-                isDarkClicked=false;
+        case true:
+            // cvs.style.backgroundColor = "#F2DEBA";
+            BG_IMG.src = 'img/lightMode.jpg';
+            // document.getElementsByTagName('body').style.backgroundcolor="#FFFBF5";
+            document.body.style.backgroundColor = "white";
+            // brick.fillColor = "black";
+            isDarkClicked = false;
             break;
         default:
             break;
@@ -544,9 +656,9 @@ let gamePlay = false;
 playing.addEventListener("click", function () {
 
     gamePlay = true;
-    playing.style.display='none';
+    playing.style.display = 'none';
     playing.innerHTML = "increase ball speed";
-    start_button_audio.play();
+    // start_button_audio.play();
     setTimeout(function () {
         start();
     }, 2000);
@@ -573,14 +685,39 @@ function resumegame() {
     interval = setInterval(loop, 20)
 }
 
+const pus = document.getElementById('pus');
+const pusbtn = document.getElementById('pause-btn');
+
+
+pusbtn.addEventListener('click', function (e) {
+    switch (isPaused) {
+        case false:
+            pus.style.display = 'block';
+            pusbtn.innerHTML = 'Resume'
+            loop()
+            isPaused = true;
+            break;
+        case true:
+            pus.style.display = 'none';
+            pusbtn.innerHTML = 'pause game';
+            pauseGame();
+            isPaused = false;
+            break;
+        default:
+            break;
+    }
+});
+
 document.addEventListener('keyup', function (e) {
-    if (e.which === 27) {
+    if (e.which === 27 ) {
         switch (isPaused) {
             case false:
+                pus.style.display = 'block';
                 loop()
                 isPaused = true;
                 break;
             case true:
+                pus.style.display = 'none';
                 pauseGame();
                 isPaused = false;
                 break;
@@ -590,8 +727,10 @@ document.addEventListener('keyup', function (e) {
     }
 });
 
-
-
-
-
+//button to generate random color for body
+let ranbtn = document.querySelector('#ran-btn');
+ranbtn.addEventListener('click', () => {
+    let x = '#' + Math.random().toString(16).slice(2 - 8);
+    document.body.style.backgroundColor = x;
+});
 
